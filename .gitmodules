@@ -1,0 +1,9 @@
+[submodule "modules/rogue"]
+	path = modules/rogue
+	url = https://github.com/Davidslv/rogue.git
+[submodule "modules/picocalc-text-starter"]
+	path = modules/picocalc-text-starter
+	url = https://github.com/BlairLeduc/picocalc-text-starter.git
+[submodule "modules/PDCurses"]
+	path = modules/PDCurses
+	url = https://github.com/wmcbrine/PDCurses.git
