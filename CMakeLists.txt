@@ -33,49 +33,20 @@ project(picocalc-rogue C CXX ASM)
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
-# Add executable. Default name is the project name, version 0.1
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_LIST_DIR}/modules/rogue
+    ${CMAKE_CURRENT_LIST_DIR}/rogue)
 
-add_executable(picocalc-rogue
-    modules/PDCurses/pdcurses/addch.c
-    modules/PDCurses/pdcurses/addchstr.c
-    modules/PDCurses/pdcurses/addstr.c
-    modules/PDCurses/pdcurses/attr.c
-    modules/PDCurses/pdcurses/beep.c
-    modules/PDCurses/pdcurses/bkgd.c
-    modules/PDCurses/pdcurses/border.c
-    modules/PDCurses/pdcurses/clear.c
-    modules/PDCurses/pdcurses/color.c
-    modules/PDCurses/pdcurses/debug.c
-    modules/PDCurses/pdcurses/delch.c
-    modules/PDCurses/pdcurses/deleteln.c
-    modules/PDCurses/pdcurses/getch.c
-    modules/PDCurses/pdcurses/getstr.c
-    modules/PDCurses/pdcurses/getyx.c
-    modules/PDCurses/pdcurses/inch.c
-    modules/PDCurses/pdcurses/inchstr.c
-    modules/PDCurses/pdcurses/initscr.c
-    modules/PDCurses/pdcurses/inopts.c
-    modules/PDCurses/pdcurses/insch.c
-    modules/PDCurses/pdcurses/insstr.c
-    modules/PDCurses/pdcurses/instr.c
-    modules/PDCurses/pdcurses/kernel.c
-    modules/PDCurses/pdcurses/keyname.c
-    modules/PDCurses/pdcurses/mouse.c
-    modules/PDCurses/pdcurses/move.c
-    modules/PDCurses/pdcurses/outopts.c
-    modules/PDCurses/pdcurses/overlay.c
-    modules/PDCurses/pdcurses/pad.c
-    modules/PDCurses/pdcurses/panel.c
-    modules/PDCurses/pdcurses/printw.c
-    modules/PDCurses/pdcurses/refresh.c
-    modules/PDCurses/pdcurses/scanw.c
-    modules/PDCurses/pdcurses/scr_dump.c
-    modules/PDCurses/pdcurses/scroll.c
-    modules/PDCurses/pdcurses/slk.c
-    modules/PDCurses/pdcurses/termattr.c
-    modules/PDCurses/pdcurses/touch.c
-    modules/PDCurses/pdcurses/util.c
-    modules/PDCurses/pdcurses/window.c
+# Apply patches
+execute_process(COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/scripts/apply_patches.sh 
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+# Add executable. Default name is the project name, version 0.1
+file(GLOB PDCURSES_SOURCES CONFIGURE_DEPENDS
+    modules/PDCurses/pdcurses/*.c
+)
+
+file(GLOB STARTER_KIT_SOURCES CONFIGURE_DEPENDS
     modules/picocalc-text-starter/drivers/audio.c
     modules/picocalc-text-starter/drivers/clib.c
     modules/picocalc-text-starter/drivers/fat32.c
@@ -84,46 +55,21 @@ add_executable(picocalc-rogue
     modules/picocalc-text-starter/drivers/lcd.c
     modules/picocalc-text-starter/drivers/sdcard.c
     modules/picocalc-text-starter/drivers/southbridge.c
-    modules/rogue/armor.c
-    modules/rogue/chase.c
-    modules/rogue/command.c
-    modules/rogue/daemon.c
-    modules/rogue/daemons.c
-    rogue/extern.c
-    modules/rogue/fight.c
-    modules/rogue/init.c
-    rogue/io.c
-    modules/rogue/list.c
-    modules/rogue/mach_dep.c
-    rogue/main.c
-    modules/rogue/mdport.c
-    modules/rogue/misc.c
-    modules/rogue/monsters.c
-    modules/rogue/move.c
-    modules/rogue/new_level.c
-    modules/rogue/options.c
-    modules/rogue/pack.c
-    modules/rogue/passages.c
-    modules/rogue/potions.c
-    modules/rogue/rings.c
-    modules/rogue/rip.c
-    modules/rogue/rooms.c
-    modules/rogue/save.c
-    modules/rogue/scrolls.c
-    modules/rogue/state.c
-    modules/rogue/sticks.c
-    modules/rogue/things.c
-    modules/rogue/vers.c
-    modules/rogue/weapons.c
-    modules/rogue/wizard.c
-    modules/rogue/xcrypt.c
-    picocalc/pdcclip.c
-    picocalc/pdcdisp.c
-    picocalc/pdcgetsc.c
-    picocalc/pdckbd.c
-    picocalc/pdcscrn.c
-    picocalc/pdcsetsc.c
-    picocalc/pdcutil.c
+)
+
+file(GLOB PICOCALC_SOURCES CONFIGURE_DEPENDS
+    picocalc/*.c
+)
+
+file(GLOB ROGUE_SOURCES CONFIGURE_DEPENDS
+    rogue/*.c
+)
+
+add_executable(picocalc-rogue
+    ${PDCURSES_SOURCES}
+    ${STARTER_KIT_SOURCES}
+    ${PICOCALC_SOURCES}
+    ${ROGUE_SOURCES}
     )
 
 pico_set_program_name(picocalc-rogue "picocalc-rogue")
@@ -158,7 +104,6 @@ target_include_directories(picocalc-rogue PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/rogue
     ${CMAKE_CURRENT_LIST_DIR}/modules/PDCurses
     ${CMAKE_CURRENT_LIST_DIR}/modules/picocalc-text-starter
-    ${CMAKE_CURRENT_LIST_DIR}/modules/rogue
     ${CMAKE_CURRENT_LIST_DIR}/picocalc
 )
 

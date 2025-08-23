@@ -5,7 +5,7 @@
 static bool key_control = false; // control key state
 static bool key_shift = false;   // shift key state
 
-static volatile char rx_buffer[KBD_BUFFER_SIZE];
+static volatile uint16_t rx_buffer[KBD_BUFFER_SIZE];
 static volatile uint16_t rx_head = 0;
 static volatile uint16_t rx_tail = 0;
 static volatile bool flush = false;
@@ -13,18 +13,20 @@ static repeating_timer_t key_timer;
 
 static struct
 {
-    uint8_t keycode;
-    unsigned short normal;
-    unsigned short shifted;
-    unsigned short control;
-    unsigned short alt;
+    uint16_t keycode;
+    uint16_t normal;
+    uint16_t shifted;
+    uint16_t control;
+    uint16_t alt;
 } key_table[] =
     {
         /* keycode          normal         shifted       control      alt*/
         {PC_KEY_LEFT, 'h', 'H', CTL_LEFT, ALT_LEFT},
         {PC_KEY_RIGHT, 'l', 'L', CTL_RIGHT, ALT_RIGHT},
-        {PC_KEY_UP, 'k', 'K', CTL_UP, ALT_UP},
-        {PC_KEY_DOWN, 'j', 'J', CTL_DOWN, ALT_DOWN},
+        {PC_KEY_UP, 'k', 0, CTL_UP, ALT_UP},
+        {PC_KEY_PAGE_UP, 0, 'K', 0, 0},
+        {PC_KEY_DOWN, 'j', 0, CTL_DOWN, ALT_DOWN},
+        {PC_KEY_PAGE_DOWN, 0, 'J', 0, 0},
         {PC_KEY_HOME, KEY_HOME, KEY_SHOME, CTL_HOME, ALT_HOME},
         {PC_KEY_BREAK, KEY_BREAK, 0, 0, 0},
         {PC_KEY_BACKSPACE, KEY_BACKSPACE, 0, 0, 0},
@@ -42,8 +44,13 @@ static struct
         {PC_KEY_RETURN, KEY_ENTER, 0, 0, 0},
         {PC_KEY_ESC, 0x1b, 0, 0, 0}};
 
-static char _lookup_key(int keycode, bool shifted, bool control, bool alt)
+static uint16_t _lookup_key(int keycode, bool shifted, bool control, bool alt)
 {
+    if (keycode >= 0x20 && keycode <= 0x7F)
+    {
+        return keycode; // ASCII range
+    }
+
     for (size_t i = 0; i < sizeof(key_table) / sizeof(key_table[0]); i++)
     {
         if (key_table[i].keycode == keycode)
@@ -98,29 +105,13 @@ static bool on_keyboard_timer(repeating_timer_t *rt)
                 }
                 else
                 {
-                    uint8_t ch = key_code;
-
-                    // If a key is released, we return the key code
-                    char new_ch = _lookup_key(key_code, key_shift, key_control, false);
-                    if (new_ch)
+                    uint16_t ch = _lookup_key(key_code, key_shift, key_control, false);
+                    if (ch)
                     {
-                        ch = new_ch;
+                        uint16_t next_head = (rx_head + 1) & (KBD_BUFFER_SIZE - 1);
+                        rx_buffer[rx_head] = ch;
+                        rx_head = next_head;
                     }
-                    else if (ch >= 'a' && ch <= 'z') // Ctrl and Shift handling
-                    {
-                        if (key_control)
-                        {
-                            ch &= 0x1F; // convert to control character
-                        }
-                        if (key_shift)
-                        {
-                            ch &= ~0x20;
-                        }
-                    }
-
-                    uint16_t next_head = (rx_head + 1) & (KBD_BUFFER_SIZE - 1);
-                    rx_buffer[rx_head] = ch;
-                    rx_head = next_head;
                 }
 
                 continue;
@@ -163,7 +154,7 @@ int PDC_get_key(void)
         tight_loop_contents();
     }
 
-    char ch = rx_buffer[rx_tail];
+    int ch = rx_buffer[rx_tail];
     rx_tail = (rx_tail + 1) & (KBD_BUFFER_SIZE - 1);
     return ch;
 }

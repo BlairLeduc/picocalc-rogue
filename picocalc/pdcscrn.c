@@ -5,11 +5,12 @@
 #include <drivers/font.h>
 #include <drivers/fat32.h>
 #include <drivers/southbridge.h>
+#include <boot/picoboot_constants.h>
 
 void PDC_scr_close(void)
 {
     PDC_LOG(("PDC_scr_close() - called\n"));
-    rom_reboot(0x00, 100, 0, 0);
+    rom_reboot(REBOOT2_FLAG_REBOOT_TYPE_NORMAL, 100, 0, 0);
 }
 
 int PDC_scr_open(void)

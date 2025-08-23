@@ -1,0 +1,74 @@
+--- a/rogue/extern.c	2025-08-18 21:28:34
++++ b/rogue/extern.c	2025-08-18 21:22:05
+@@ -348,14 +348,14 @@
+     {CTRL('U'),	"	run up & right until adjacent",		FALSE},
+     {CTRL('B'),	"	run down & left until adjacent",	FALSE},
+     {CTRL('N'),	"	run down & right until adjacent",	FALSE},
+-    {'\0',	"	<SHIFT><dir>: run that way",		TRUE},
+-    {'\0',	"	<CTRL><dir>: run till adjacent",	TRUE},
+-    {'f',	"<dir>	fight till death or near death",	TRUE},
++    {'\0',	"	<SHFT><dir>: run",		TRUE},
++    {'\0',	"	<CTRL><dir>: run adj",	TRUE},
++    {'f',	"<dir>	fight till (near) death",	TRUE},
+     {'t',	"<dir>	throw something",			TRUE},
+-    {'m',	"<dir>	move onto without picking up",		TRUE},
+-    {'z',	"<dir>	zap a wand in a direction",		TRUE},
++    {'m',	"<dir>	move without picking up",		TRUE},
++    {'z',	"<dir>	zap a wand",		TRUE},
+     {'^',	"<dir>	identify trap type",			TRUE},
+-    {'s',	"	search for trap/secret door",		TRUE},
++    {'s',	"	search for trap/secret",		TRUE},
+     {'>',	"	go down a staircase",			TRUE},
+     {'<',	"	go up a staircase",			TRUE},
+     {'.',	"	rest for a turn",			TRUE},
+@@ -377,7 +377,7 @@
+     {']',	"	print current armor",			TRUE},
+     {'=',	"	print current rings",			TRUE},
+     {'@',	"	print current stats",			TRUE},
+-    {'D',	"	recall what's been discovered",		TRUE},
++    {'D',	"	recall discovered",		TRUE},
+     {'o',	"	examine/set options",			TRUE},
+     {CTRL('R'),	"	redraw screen",				TRUE},
+     {CTRL('P'),	"	repeat last message",			TRUE},
+@@ -385,7 +385,7 @@
+     {'S',	"	save game",				TRUE},
+     {'Q',	"	quit",					TRUE},
+     {'!',	"	shell escape",				TRUE},
+-    {'F',	"<dir>	fight till either of you dies",		TRUE},
++    {'F',	"<dir>	fight till one dies",		TRUE},
+     {'v',	"	print version number",			TRUE},
+     {0,		NULL }
+ };
+--- a/rogue/io.c	2025-08-18 21:28:38
++++ b/rogue/io.c	2025-08-18 21:22:56
+@@ -220,7 +220,7 @@
+     if (stat_msg)
+     {
+ 	move(0, 0);
+-        msg("Level: %d  Gold: %-5d  Hp: %*d(%*d)  Str: %2d(%d)  Arm: %-2d  Exp: %d/%ld  %s",
++        msg("Lvl: %d G: %-5d H: %*d(%*d) S: %2d(%d) A: %-2d E: %d/%ld %s",
+ 	    level, purse, hpwidth, pstats.s_hpt, hpwidth, max_hp, pstats.s_str,
+ 	    max_stats.s_str, 10 - s_arm, pstats.s_lvl, pstats.s_exp,
+ 	    state_name[hungry_state]);
+@@ -229,7 +229,7 @@
+     {
+ 	move(STATLINE, 0);
+                 
+-        printw("Level: %d  Gold: %-5d  Hp: %*d(%*d)  Str: %2d(%d)  Arm: %-2d  Exp: %d/%d  %s",
++        printw("Lvl: %d G: %-5d H: %*d(%*d) S: %2d(%d) A: %-2d E: %d/%d %s",
+ 	    level, purse, hpwidth, pstats.s_hpt, hpwidth, max_hp, pstats.s_str,
+ 	    max_stats.s_str, 10 - s_arm, pstats.s_lvl, pstats.s_exp,
+ 	    state_name[hungry_state]);
+--- a/rogue/rogue.h	2025-08-18 21:28:51
++++ b/rogue/rogue.h	2025-08-18 21:22:15
+@@ -27,8 +27,8 @@
+ #define AMULETLEVEL	26
+ #define	NUMTHINGS	7	/* number of types of things */
+ #define MAXPASS		13	/* upper limit on number of passages */
+-#define	NUMLINES	24
+-#define	NUMCOLS		80
++#define	NUMLINES	32
++#define	NUMCOLS		64
+ #define STATLINE		(NUMLINES - 1)
+ #define BORE_LEVEL	50
+ 
