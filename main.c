@@ -1,13 +1,12 @@
 #include <stdio.h>
 
+#include "hardware/watchdog.h"
+
 #include <drivers/audio.h>
 #include <drivers/fat32.h>
 #include <drivers/font.h>
 #include <drivers/lcd.h>
 #include <drivers/southbridge.h>
-
-#include <pico/bootrom.h>
-#include <boot/picoboot_constants.h>
 
 #include <curses.h>
 
@@ -22,6 +21,21 @@ static char* argv_restore[] = {
 };
 
 static char* environment[] = {};
+
+void rogue_terminate(int status)
+{
+    watchdog_reboot(0, 0, 0); // Reboot the device
+}
+
+void rogue_exit(int status)
+{
+    // Perform any necessary cleanup here
+    msg("Turn off the PicoCalc now.");
+    while (1)
+    {
+       tight_loop_contents();
+    }
+}
 
 int main(int argc, char **argv, char **envp)
 {
@@ -42,15 +56,6 @@ int main(int argc, char **argv, char **envp)
     }
 
     rogue_main(argc, argv, environment);
-    rom_reboot(REBOOT2_FLAG_REBOOT_TYPE_NORMAL, 100, 0, 0);
-}
 
-void rogue_exit(int status)
-{
-    // Perform any necessary cleanup here
-    msg("Turn off the PicoCalc now.");
-    while (1)
-    {
-       tight_loop_contents();
-    }
+    rogue_exit(0);
 }

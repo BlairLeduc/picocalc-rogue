@@ -71,16 +71,18 @@
  	    max_stats.s_str, 10 - s_arm, pstats.s_lvl, pstats.s_exp,
  	    state_name[hungry_state]);
 --- a/rogue/main.c	2025-08-23 15:54:36
-+++ b/rogue/main.c	2025-08-23 15:54:42
-@@ -13,6 +13,7 @@
++++ b/rogue/main.c	2025-08-23 17:07:43
+@@ -13,14 +13,17 @@
  #include <signal.h>
  #include <time.h>
  #include <curses.h>
 +#include "pico/rand.h"
  #include "rogue.h"
  
++extern void rogue_terminate(int status);
++
  /*
-@@ -20,7 +21,7 @@
+  * main:
   *	The main program, of course
   */
  int
@@ -89,7 +91,7 @@
  {
      char *env;
      int lowtime;
-@@ -45,11 +46,8 @@
+@@ -45,11 +48,8 @@
      /*
       * get home and options from environment
       */
@@ -102,7 +104,7 @@
  
      if ((env = getenv("ROGUEOPTS")) != NULL)
  	parse_opts(env);
-@@ -185,7 +183,7 @@
+@@ -185,7 +185,7 @@
  int
  rnd(int range)
  {
@@ -111,6 +113,14 @@
  }
  
  /*
+@@ -391,6 +391,6 @@
+ my_exit(int st)
+ {
+     resetltchars();
+-    exit(st);
++    rogue_terminate(st);
+ }
+ 
 --- a/rogue/rogue.h	2025-08-18 21:28:51
 +++ b/rogue/rogue.h	2025-08-23 15:39:37
 @@ -11,6 +11,7 @@

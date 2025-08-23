@@ -23,7 +23,7 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-set(PICO_BOARD pimoroni_pico_plus2_w_rp2350 CACHE STRING "Board type")
+set(PICO_BOARD pico CACHE STRING "Board type")
 set(PICOCALC_ROGUE_VERSION "0.1" CACHE STRING "PicoCalc Rogue version")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
