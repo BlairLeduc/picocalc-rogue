@@ -30,10 +30,22 @@ Michael C. Toy, Kenneth C. R. C. Arnold, Glenn Wichman
 
 # Helpful Notes
 
+**No one has won the game**, and this is not what your goal should be. The
+goal is to enjoy playing, learning the richness of the game, increasing
+your skill, and the amount of gold you collect before you die. This is not your
+fault, the game is random and is sometimes unfair, as in life.
+
+When you save your game, your current session ends. When you return to the
+game, your last session is restored and your game save is deleted (on purpose).
+You get one life in Rogue and this behaviour is to maintain the permanance of
+death. The act of saving the game is to enable picking up where you left off
+at some point in the future. You can work around this, referred to as "save
+scumming," but this is frowned upon and viewed as cheating.
+
 You will find learning the movement keys to be essential to playing
 effectively. On the PicoCalc kit, the arrow keys are mapped to the
 up, down, left and right directions, but not the diagonal directions.
-Moving diagonally uses half the food than moving horizontally/vertically
+Moving diagonally uses half the food of moving horizontally/vertically
 in series.
 
 The movement keys are as follows:
@@ -46,19 +58,15 @@ H -*- L
 B  J  N
 ```
 
-The movement keys are based on the standard vi editor movement keys, with the addition of diagonal movement.
+The movement keys are based on the standard vi editor movement keys, with the
+addition of diagonal movement.
 
 Combining a movement with the `Shift` key allows you to run in that direction
-until you hit something; such as a wall, an item or a monster.
+until you hit something; such as a wall, an item or a monster. The `Shift`
+modifier does not work with the arrow keys.
 
-The `Ctrl` combination allows you to move in the specified direction and stop
-if you before you hit something or come across an item or monster next to your
-path.
-
-Use `?` to get a list of available commands.
-
-Use `/` to identify things on the screen.
-
-
+The `Ctrl` modifier allows you to move in the specified direction and stops
+before you hit something or come across an item or monster next to your
+path. This modifier does work with the arrow keys.
 
 To get started, read the [A Guide to the Dungeons of Doom](GUIDE.md).
