@@ -61,4 +61,4 @@ Use `/` to identify things on the screen.
 
 
 
-To get started, read the [A Guide to the Dungeons of Doom](GUIDE.html).
+To get started, read the [A Guide to the Dungeons of Doom](GUIDE.md).
