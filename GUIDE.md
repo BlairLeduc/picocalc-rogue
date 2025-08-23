@@ -112,7 +112,7 @@ pieces of cryptic information describing your current
 status. Here is an explanation of what these things
 mean:
 
-| | |
+| Label | Meaning |
 |---|---|
 | Lvl | This number indicates how deep you have gone in the dungeon. It starts at one and goes up as you go deeper into the dungeon. |
 | G | The number of gold pieces you have managed to find and keep with you so far. |
@@ -140,7 +140,7 @@ level as you have explored it so far. Each symbol on the
 screen represents something. Here is a list of what the
 various symbols mean:
 
-| | |
+| Glyph | Meaning |
 |---|---|
 | @ | You, the adventurer. |
 | - \| | Walls of rooms. |
@@ -168,7 +168,7 @@ with the `?` command. Here it is for reference,
 with a short explanation of each
 command.
 
-| | |
+| Key | Action |
 |---|---|
 | `?` | The help command. Asks for a character to give help on. If you type a `*`, it will list all the commands, otherwise it will explain what the character you typed does. |
 | `/` | This is the &ldquo;What is that on the screen?&rdquo; command. A `/` followed by any character that you see on the level, will tell you what that character is. For instance, typing &ldquo;/@&rdquo; will tell you that the &ldquo;@&rdquo; symbol represents you, the player. |
@@ -421,7 +421,7 @@ list.
 you enjoy eating. It is basically a whimsy that rogue uses
 in a couple of places.
 
-**file** [*~/rogue.save*]
+**file** [*/Rogue/rogue.save*]
 : The default file name for saving the game.
 If you trun off the PicoCalc, rogue will
 automatically save the game in this file.
@@ -460,11 +460,10 @@ teeming multitudes who graciously ignored work, school, and
 social life to play rogue and send us bugs, complaints, suggestions, and just plain flames. And also
 Mom.
 
-| | |
-|---|---|
-| <sup>&dagger;</sup> | UNIX is a registered trademark of The Open Group |
-| <sup>1</sup> | As opposed to pseudo English sentences. |
-| <sup>2</sup> | A minimum screen size of 24 lines by 80 columns is required. If the screen is larger, only the 24x80 section will be used for the map. |
-| <sup>3</sup> | Actually, it's a dialect spoken only by the twenty-seven members of a tribe in Outer Mongolia, but you're not supposed to know that. |
-| <sup>4</sup> | The Dungeon's wizard is named Wally the Wonder Badger. Invocations should be accompanied by a sizable donation. |
+---
+<sup>&dagger;</sup> UNIX is a registered trademark of The Open Group  
+<sup>1</sup> As opposed to pseudo English sentences.  
+<sup>2</sup> A minimum screen size of 24 lines by 80 columns is required. If the screen is larger, only the 24x80 section will be used for the map.  
+<sup>3</sup> Actually, it's a dialect spoken only by the twenty-seven members of a tribe in Outer Mongolia, but you're not supposed to know that.  
+<sup>4</sup> The Dungeon's wizard is named Wally the Wonder Badger. Invocations should be accompanied by a sizable donation.  
 

@@ -1,3 +1,14 @@
+--- a/rogue/command.c	2025-08-16 17:49:39
++++ b/rogue/command.c	2025-08-23 15:39:14
+@@ -291,7 +291,7 @@
+ 		    wrefresh(curscr);
+ 		when 'v':
+ 		    after = FALSE;
+-		    msg("version %s. (mctesq was here)", release);
++		    msg("version %s. (mctesq was here) PicoCalc %s.", release, PICOCALC_ROGUE_VERSION);
+ 		when 'S': 
+ 		    after = FALSE;
+ 		    save_game();
 --- a/rogue/extern.c	2025-08-18 21:28:34
 +++ b/rogue/extern.c	2025-08-18 21:22:05
 @@ -348,14 +348,14 @@
@@ -46,7 +57,7 @@
      {
  	move(0, 0);
 -        msg("Level: %d  Gold: %-5d  Hp: %*d(%*d)  Str: %2d(%d)  Arm: %-2d  Exp: %d/%ld  %s",
-+        msg("Lvl: %d G: %-5d Hp: %*d(%*d) Str: %2d(%d) Arm: %-2d Exp: %d/%ld %s",
++        msg("Lvl: %d G: %-5d H: %*d(%*d) S: %2d(%d) A: %-2d E: %d/%ld %s",
  	    level, purse, hpwidth, pstats.s_hpt, hpwidth, max_hp, pstats.s_str,
  	    max_stats.s_str, 10 - s_arm, pstats.s_lvl, pstats.s_exp,
  	    state_name[hungry_state]);
@@ -55,12 +66,12 @@
  	move(STATLINE, 0);
                  
 -        printw("Level: %d  Gold: %-5d  Hp: %*d(%*d)  Str: %2d(%d)  Arm: %-2d  Exp: %d/%d  %s",
-+        printw("Lvl: %d G: %-5d Hp: %*d(%*d) Str: %2d(%d) Arm: %-2d Exp: %d/%d %s",
++        printw("Lvl: %d G: %-5d H: %*d(%*d) S: %2d(%d) A: %-2d E: %d/%d %s",
  	    level, purse, hpwidth, pstats.s_hpt, hpwidth, max_hp, pstats.s_str,
  	    max_stats.s_str, 10 - s_arm, pstats.s_lvl, pstats.s_exp,
  	    state_name[hungry_state]);
---- a/rogue/main.c	2025-08-18 21:28:43
-+++ b/rogue/main.c	2025-08-22 21:22:39
+--- a/rogue/main.c	2025-08-23 15:54:36
++++ b/rogue/main.c	2025-08-23 15:54:42
 @@ -13,6 +13,7 @@
  #include <signal.h>
  #include <time.h>
@@ -78,7 +89,20 @@
  {
      char *env;
      int lowtime;
-@@ -185,7 +186,7 @@
+@@ -45,11 +46,8 @@
+     /*
+      * get home and options from environment
+      */
+-
+-    strncpy(home, md_gethomedir(), MAXSTR);
+ 
+-    strcpy(file_name, home);
+-    strcat(file_name, "rogue.save");
++    strcpy(file_name, "/Rogue/rogue.save");
+ 
+     if ((env = getenv("ROGUEOPTS")) != NULL)
+ 	parse_opts(env);
+@@ -185,7 +183,7 @@
  int
  rnd(int range)
  {
@@ -88,8 +112,16 @@
  
  /*
 --- a/rogue/rogue.h	2025-08-18 21:28:51
-+++ b/rogue/rogue.h	2025-08-18 21:22:15
-@@ -27,8 +27,8 @@
++++ b/rogue/rogue.h	2025-08-23 15:39:37
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include "extern.h"
++#include "version.h"
+ 
+ #undef lines 
+ 
+@@ -27,8 +28,8 @@
  #define AMULETLEVEL	26
  #define	NUMTHINGS	7	/* number of types of things */
  #define MAXPASS		13	/* upper limit on number of passages */
@@ -100,3 +132,23 @@
  #define STATLINE		(NUMLINES - 1)
  #define BORE_LEVEL	50
  
+--- a/rogue/save.c	2025-08-16 17:49:39
++++ b/rogue/save.c	2025-08-23 16:14:28
+@@ -19,6 +19,8 @@
+ #include <curses.h>
+ #include "rogue.h"
+ #include "score.h"
++
++extern void rogue_exit(int status);
+ 
+ typedef struct stat STAT;
+ 
+@@ -151,7 +153,7 @@
+     rs_save_file(savef);
+     fflush(savef);
+     fclose(savef);
+-    exit(0);
++    rogue_exit(0);
+ }
+ 
+ /*

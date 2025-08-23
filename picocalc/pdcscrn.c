@@ -1,28 +1,13 @@
 #include "pdcpicocalc.h"
 
-#include <pico/bootrom.h>
-
-#include <drivers/font.h>
-#include <drivers/fat32.h>
-#include <drivers/southbridge.h>
-#include <boot/picoboot_constants.h>
-
 void PDC_scr_close(void)
 {
     PDC_LOG(("PDC_scr_close() - called\n"));
-    rom_reboot(REBOOT2_FLAG_REBOOT_TYPE_NORMAL, 100, 0, 0);
 }
 
 int PDC_scr_open(void)
 {
     PDC_LOG(("PDC_scr_open() - called\n"));
-
-    sb_init();
-    audio_init();
-    lcd_init();
-    fat32_init();
-
-    lcd_set_font(&font_5x10);
 
     SP->orig_attr = FALSE;
     SP->audible = TRUE;

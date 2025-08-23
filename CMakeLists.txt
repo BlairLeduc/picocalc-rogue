@@ -24,6 +24,7 @@ if (EXISTS ${picoVscode})
 endif()
 # ====================================================================================
 set(PICO_BOARD pimoroni_pico_plus2_w_rp2350 CACHE STRING "Board type")
+set(PICOCALC_ROGUE_VERSION "0.1" CACHE STRING "PicoCalc Rogue version")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
@@ -87,7 +88,8 @@ add_executable(picocalc-rogue
 add_dependencies(picocalc-rogue patch_rogue)
 
 pico_set_program_name(picocalc-rogue "picocalc-rogue")
-pico_set_program_version(picocalc-rogue "0.1")
+pico_set_program_version(picocalc-rogue "${PICOCALC_ROGUE_VERSION}")
+pico_set_program_url(picocalc-rogue "https://github.com/BlairLeduc/picocalc-rogue")
 
 # Generate PIO header
 pico_generate_pio_header(picocalc-rogue ${CMAKE_CURRENT_LIST_DIR}/modules/picocalc-text-starter/drivers/audio.pio)
@@ -99,6 +101,12 @@ target_compile_definitions(picocalc-rogue PUBLIC
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(picocalc-rogue 0)
 pico_enable_stdio_usb(picocalc-rogue 0)
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/version.h
+    @ONLY
+)
 
 # Add the standard library to the build
 target_link_libraries(picocalc-rogue

@@ -4,6 +4,7 @@ void PDC_gotoyx(int y, int x)
 {
     lcd_erase_cursor();
     lcd_move_cursor(x, y);
+    lcd_draw_cursor();
 }
 
 void PDC_doupdate(void)

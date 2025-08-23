@@ -2,6 +2,7 @@
 
 #include <pico/stdlib.h>
 #include <pwd.h>
+
 #define lstat stat
 
 /* Define if scorefile is top scores, not top players */
