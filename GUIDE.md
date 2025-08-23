@@ -1,4 +1,4 @@
-
+> ***The following guide has been modified from the original work by Michael C. Toy and Kenneth C. R. C. Arnold to represent Rogue on the PicoCalc Kit. The original guide can be found in [rogure.doc.in](rogue.doc.in).***
 
 # A Guide to the Dungeons of Doom
 
@@ -15,7 +15,7 @@ Berkeley, California 94720
 
 ## ABSTRACT
 
-> **Rogue** is a visual CRT based fantasy game which runs under the 
+> **Rogue** is a visual CRT based fantasy game which originally ran under the 
 > UNIX<sup>&dagger;</sup> timesharing system. This paper describes how 
 > to play rogue, and gives a few hints for those who might otherwise get 
 > lost in the Dungeons of Doom.
@@ -62,7 +62,7 @@ you.
 
 Rogue differs from most computer fantasy
 games in that it is screen oriented. Commands are all one or
-two keystrokes<sup>1 </sup>and the
+two keystrokes<sup>1</sup> and the
 results of your commands are displayed graphically on the
 screen rather than being explained in words<sup>2</sup>.
 
@@ -97,11 +97,12 @@ ____________________________________________________________
 
 
 
-Level: 1  Gold: 0      Hp: 12(12)  Str: 16(16)  Arm: 4  Exp: 1/0
+Lvl: 1  G: 0      Hp: 12(12)  Str: 16(16)  Arm: 4  Exp: 1/0
 
                           Figure 1
 ____________________________________________________________
 ```
+
 </div>
 
 ### 3.1. The bottom line
@@ -113,8 +114,8 @@ mean:
 
 | | |
 |---|---|
-| Level | This number indicates how deep you have gone in the dungeon. It starts at one and goes up as you go deeper into the dungeon. |
-| Gold | The number of gold pieces you have managed to find and keep with you so far. |
+| Lvl | This number indicates how deep you have gone in the dungeon. It starts at one and goes up as you go deeper into the dungeon. |
+| G | The number of gold pieces you have managed to find and keep with you so far. |
 | Hp | Your current and maximum health points. Health points indicate how much damage you can take before you die. The more you get hit in a fight, the lower they get. You can regain health points by resting. The number in parentheses is the maximum number your health points can reach. |
 | Str | Your current strength and maximum ever strength. This can be any integer less than or equal to 31, or greater than or equal to three. The higher the number, the stronger you are. The number in the parentheses is the maximum strength you have attained so far this game.
 | Arm | Your current armor protection. This number indicates how effective your armor is in stopping blows from unfriendly creatures. The higher this number is, the more effective the armor.
@@ -142,7 +143,7 @@ various symbols mean:
 | | |
 |---|---|
 | @ | You, the adventurer. |
-| - | Walls of rooms. |
+| - \| | Walls of rooms. |
 | + | Doors to/from a room. |
 | . | Floor of a room. |
 | # | Floor of a passage between rooms. |
@@ -161,59 +162,58 @@ various symbols mean:
 ## 4. Commands
 Commands are given to rogue by typing one or two characters. 
 Most commands can be preceded by a count to repeat them (e.g. typing &ldquo;10s&rdquo; will do ten searches). Commands for which counts make no sense have the count 
-ignored. To cancel a count or a prefix, type &lt;ESCAPE&gt; . The list of commands is
+ignored. To cancel a count or a prefix, type `Esc`. The list of commands is
 rather long, but it can be read at any time during the game
-with the &ldquo;?&rdquo; command. Here it is for reference,
+with the `?` command. Here it is for reference,
 with a short explanation of each
 command.
 
 | | |
 |---|---|
-| ? | The help command. Asks for a character to give help on. If you type a &ldquo;*&rdquo;, it will list all the commands, otherwise it will explain what the character you typed does. |
-| / | This is the &ldquo;What is that on the screen?&rdquo; command. A &ldquo;/&rdquo; followed by any character that you see on the level, will tell you what that character is. For instance, typing &ldquo;/@&rdquo; will tell you that the &ldquo;@&rdquo; symbol represents you, the player. |
-| h, H, ^H | Move left. You move one space to the left. If you use upper case &ldquo;H&rdquo;, you will continue to move left until you run into something. This works for all movement commands (e.g. &ldquo;L&rdquo; means run in direction &ldquo;h&rdquo;) If you use the &ldquo;control&rdquo; &ldquo;H&rdquo;, you will continue moving in the specified direction until you pass something interesting or run into a wall. You should experiment with this, since it is a very useful command, but very difficult to describe. This also works for all movement commands. |
-| j | Move down. |
-| k | Move up. |
-| l | Move right. |
-| y | Move diagonally up and left. |
-| u | Move diagonally up and right. |
-| b | Move diagonally down and left. |
-| n | Move diagonally down and right. |
-| t | Throw an object. This is a prefix command. When followed with a direction it throws an object in the specified direction. (e.g. type &ldquo;th&rdquo; to throw something to the left.) |
-| f | Fight until someone dies. When followed with a direction this will force you to fight the creature in that direction until either you or it bites the big one. |
-| m | Move onto something without picking it up. This will move you one space in the direction you specify and, if there is an object there you can pick up, it won&rsquo;t do it. |
-| z | Zap prefix. Point a staff or wand in a given direction and fire it. Even non-directional staves must be pointed in some direction to be used. |
-| ^ | Identify trap command. If a trap is on your map and you can&rsquo;t remember what type it is, you can get rogue to remind you by getting next to it and typing &ldquo;^&rdquo; followed by the direction that would move you on top of it. |
-| s | Search for traps and secret doors. Examine each space immediately adjacent to you for the existence of a trap or secret door. There is a large chance that even if there is something there, you won&rsquo;t find it, so you might have to search a while before you find something. |
-| &gt; | Climb down a staircase to the next level. Not surprisingly, this can only be done if you are standing on staircase. |
-| &lt; | Climb up a staircase to the level above. This can&rsquo;t be done without the Amulet of Yendor in your possession. |
-| . | Rest. This is the &ldquo;do nothing&rdquo; command. This is good for waiting and healing. |
-| , | Pick up something. This picks up whatever you are currently standing on, if you are standing on anything at all. |
-| i | Inventory. List what you are carrying in your pack. |
-| I | Selective inventory. Tells you what a single item in your pack is. |
-| q | Quaff one of the potions you are carrying. |
-| r | Read one of the scrolls in your pack. |
-| e | Eat food from your pack. |
-| w | Wield a weapon. Take a weapon out of your pack and carry it for use in combat, replacing the one you are currently using (if any). |
-| W | Wear armor. You can only wear one suit of armor at a time. This takes extra time. |
-| T | Take armor off. You can&rsquo;t remove armor that is cursed. This takes extra time. |
-| P | Put on a ring. You can wear only two rings at a time (one on each hand). If you aren&rsquo;t wearing any rings, this command will ask you which hand you want to wear it on, otherwise, it will place it on the unused hand. The program assumes that you wield your sword in your right hand. |
-| R | Remove a ring. If you are only wearing one ring, this command takes it off. If you are wearing two, it will ask you which one you wish to remove. |
-| d | Drop an object. Take something out of your pack and leave it lying on the floor. Only one object can occupy each space. You cannot drop a cursed object at all if you are wielding or wearing it. |
-| c | Call an object something. If you have a type of object in your pack which you wish to remember something about, you can use the call command to give a name to that type of object. This is usually used when you figure out what a potion, scroll, ring, or staff is after you pick it up, or when you want to remember which of those swords in your pack you were wielding. |
-| D | Print out which things you&rsquo;ve discovered something about. This command will ask you what type of thing you are interested in. If you type the character for a given type of object (<i>e.g.</i> &ldquo;!&rdquo; for potion) it will tell you which kinds of that type of object you&rsquo;ve discovered (<i>i.e.</i>, figured out what they are). This command works for potions, scrolls, rings, and staves and wands. |
-| o | Examine and set options. This command is further explained in the section on options. |
-| ^R | Redraws the screen. Useful if spurious messages or transmission errors have messed up the display. |
-| ^P | Print last message. Useful when a message disappears before you can read it. This only repeats the last message that was not a mistyped command so that you don&rsquo;t loose anything by accidentally typing the wrong character instead of ^P. |
-| &lt;ESCAPE&gt; | Cancel a command, prefix, or count. |
-| ! | Escape to a shell for some commands. |
-| Q | Quit. Leave the game. |
-| S | Save the current game in a file. It will ask you whether you wish to use the default save file. <br/>*Caveat*: Rogue won&rsquo;t let you start up a copy of a saved game, and it removes the save file as soon as you start up a restored game. This is to prevent people from saving a game just before a dangerous position and then restarting it if they die. |
-| v | Prints the program version number.|
-| ) | Print the weapon you are currently wielding |
-| ] | Print the armor you are currently wearing |
-| = | Print the rings you are currently wearing |
-| @ | Reprint the status line on the message line |
+| `?` | The help command. Asks for a character to give help on. If you type a `*`, it will list all the commands, otherwise it will explain what the character you typed does. |
+| `/` | This is the &ldquo;What is that on the screen?&rdquo; command. A `/` followed by any character that you see on the level, will tell you what that character is. For instance, typing &ldquo;/@&rdquo; will tell you that the &ldquo;@&rdquo; symbol represents you, the player. |
+| `h`, `H`, `^H` | Move left. You move one space to the left. If you use upper case &ldquo;H&rdquo;, you will continue to move left until you run into something. This works for all movement commands (e.g. `H` means run in direction `h`) If you use the `Ctrl` `h`, you will continue moving in the specified direction until you pass something interesting or run into a wall. You should experiment with this, since it is a very useful command, but very difficult to describe. This also works for all movement commands. |
+| `j` | Move down. |
+| `k` | Move up. |
+| `l` | Move right. |
+| `y` | Move diagonally up and left. |
+| `u` | Move diagonally up and right. |
+| `b` | Move diagonally down and left. |
+| `n` | Move diagonally down and right. |
+| `t` | Throw an object. This is a prefix command. When followed with a direction it throws an object in the specified direction. (e.g. type &ldquo;th&rdquo; to throw something to the left.) |
+| `f` | Fight until someone dies. When followed with a direction this will force you to fight the creature in that direction until either you or it bites the big one. |
+| `m` | Move onto something without picking it up. This will move you one space in the direction you specify and, if there is an object there you can pick up, it won&rsquo;t do it. |
+| `z` | Zap prefix. Point a staff or wand in a given direction and fire it. Even non-directional staves must be pointed in some direction to be used. |
+| `^` | Identify trap command. If a trap is on your map and you can&rsquo;t remember what type it is, you can get rogue to remind you by getting next to it and typing `^` followed by the direction that would move you on top of it. |
+| `s` | Search for traps and secret doors. Examine each space immediately adjacent to you for the existence of a trap or secret door. There is a large chance that even if there is something there, you won&rsquo;t find it, so you might have to search a while before you find something. |
+| `>` | Climb down a staircase to the next level. Not surprisingly, this can only be done if you are standing on staircase. |
+| `<` | Climb up a staircase to the level above. This can&rsquo;t be done without the Amulet of Yendor in your possession. |
+| `.` | Rest. This is the &ldquo;do nothing&rdquo; command. This is good for waiting and healing. |
+| `,` | Pick up something. This picks up whatever you are currently standing on, if you are standing on anything at all. |
+| `i` | Inventory. List what you are carrying in your pack. |
+| `I` | Selective inventory. Tells you what a single item in your pack is. |
+| `q` | Quaff one of the potions you are carrying. |
+| `r` | Read one of the scrolls in your pack. |
+| `e` | Eat food from your pack. |
+| `w` | Wield a weapon. Take a weapon out of your pack and carry it for use in combat, replacing the one you are currently using (if any). |
+| `W` | Wear armor. You can only wear one suit of armor at a time. This takes extra time. |
+| `T` | Take armor off. You can&rsquo;t remove armor that is cursed. This takes extra time. |
+| `P` | Put on a ring. You can wear only two rings at a time (one on each hand). If you aren&rsquo;t wearing any rings, this command will ask you which hand you want to wear it on, otherwise, it will place it on the unused hand. The program assumes that you wield your sword in your right hand. |
+| `R` | Remove a ring. If you are only wearing one ring, this command takes it off. If you are wearing two, it will ask you which one you wish to remove. |
+| `d` | Drop an object. Take something out of your pack and leave it lying on the floor. Only one object can occupy each space. You cannot drop a cursed object at all if you are wielding or wearing it. |
+| `c` | Call an object something. If you have a type of object in your pack which you wish to remember something about, you can use the call command to give a name to that type of object. This is usually used when you figure out what a potion, scroll, ring, or staff is after you pick it up, or when you want to remember which of those swords in your pack you were wielding. |
+| `D` | Print out which things you&rsquo;ve discovered something about. This command will ask you what type of thing you are interested in. If you type the character for a given type of object (<i>e.g.</i> &ldquo;!&rdquo; for potion) it will tell you which kinds of that type of object you&rsquo;ve discovered (<i>i.e.</i>, figured out what they are). This command works for potions, scrolls, rings, and staves and wands. |
+| `o` | Examine and set options. This command is further explained in the section on options. |
+| `^R `| Redraws the screen. Useful if spurious messages or transmission errors have messed up the display. |
+| `^P` | Print last message. Useful when a message disappears before you can read it. This only repeats the last message that was not a mistyped command so that you don&rsquo;t loose anything by accidentally typing the wrong character instead of `^P`. |
+| `Esc` | Cancel a command, prefix, or count. |
+| `Q` | Quit. Leave the game. |
+| `S` | Save the current game in a file. It will ask you whether you wish to use the default save file. <br/>*Caveat*: Rogue won&rsquo;t let you start up a copy of a saved game, and it removes the save file as soon as you start up a restored game. This is to prevent people from saving a game just before a dangerous position and then restarting it if they die. |
+| `v` | Prints the program version number.|
+| `)` | Print the weapon you are currently wielding |
+| `]` | Print the armor you are currently wearing |
+| `=` | Print the rings you are currently wearing |
+| `@` | Reprint the status line on the message line |
 
 ## 5. Rooms
 
@@ -239,21 +239,19 @@ valor.
 When you find something in the dungeon, it
 is common to want to pick the object up. This is
 accomplished in rogue by walking over the object (unless you
-use the &ldquo;m&rdquo; prefix, see above). If you are
-carrying too many things, the pro- gram will tell you and it
-won&rsquo;t pick up the object, other- wise it will add it
+use the `m` prefix, see above). If you are
+carrying too many things, the program will tell you and it
+won&rsquo;t pick up the object, otherwise it will add it
 to your pack and tell you what you just picked
 up.
 
 Many of the commands that operate on
 objects must prompt you to find out which object you want to
 use. If you change your mind and don&rsquo;t want to do that
-command after all, just type an
-&lt;ESCAPE&gt; and the command will be
-aborted.
+command after all, just type an `Esc` and the command will be aborted.
 
 Some objects, like armor and weapons, are
-easily dif- ferentiated. Others, like scrolls and potions,
+easily differentiated. Others, like scrolls and potions,
 are given labels which vary according to type. During a
 game, any two of the same kind of object with the same label
 are the same type. However, the labels will vary from game
@@ -274,8 +272,7 @@ must wield it. To fire an arrow out of a bow, you must first
 wield the bow, then throw the arrow. You can only wield one
 weapon at a time, but you can&rsquo;t change weapons if the
 one you are currently wielding is cursed. The commands to
-use weapons are &ldquo;w&rdquo; (wield) and &ldquo;t&rdquo;
-(throw).
+use weapons are `w` (wield) and `t` (throw).
 
 ## 7.2. Armor
 
@@ -306,20 +303,19 @@ protection that is lower than normal is
 cursed.
 
 The commands to use weapons are
-&ldquo;W&rdquo; (wear) and &ldquo;T&rdquo; (take
-off).
+`W` (wear) and `T` (take off).
 
 ## 7.3. Scrolls
 
 Scrolls come with titles in an unknown tongue<sup>3</sup>. After you read a scroll, it 
-disappears from your pack. The com mand to use a
-scroll is &ldquo;r&rdquo; (read).
+disappears from your pack. The command to use a
+scroll is `r` (read).
 
 ## 7.4. Potions
 
 Potions are labeled by the color of the
 liquid inside the flask. They disappear after being quaffed.
-The command to use a scroll is &ldquo;q&rdquo;
+The command to use a potion is `q`
 (quaff).
 
 ## 7.5. Staves and Wands
@@ -327,7 +323,7 @@ The command to use a scroll is &ldquo;q&rdquo;
 Staves and wands do the same kinds of
 things. Staves are identified by a type of wood; wands by a
 type of metal or bone. They are generally things you want to
-do to some- thing over a long distance, so you must point
+do to something over a long distance, so you must point
 them at what you wish to affect to use them. Some staves are
 not affected by the direction they are pointed, though.
 Staves come with multiple magic charges, the number being
@@ -335,7 +331,7 @@ random, and when they are used up, the staff is just a piece
 of wood or metal.
 
 The command to use a wand or staff is
-&ldquo;z&rdquo; (zap)
+`z` (zap)
 
 ## 7.6. Rings
 
@@ -345,15 +341,14 @@ effects of potions, scrolls, and staves. Of course, the bad
 rings are also more powerful. Most rings also cause you to
 use up food more rapidly, the rate varying with the type of
 ring. Rings are differentiated by their stone settings. The
-com- mands to use rings are &ldquo;P&rdquo; (put on) and
-&ldquo;R&rdquo; (remove).
+commands to use rings are `P` (put on) and `R` (remove).
 
 ## 7.7. Food
 
 Food is necessary to keep you going. If you
 go too long without eating you will faint, and eventually
 die of starvation. The command to use food is
-&ldquo;e&rdquo; (eat).
+`e` (eat).
 
 ## 8. Options
 
@@ -364,40 +359,18 @@ various different ways.
 
 ## 8.1 Setting the options
 
-There are two ways to set the options. The
-first is with the &ldquo;o&rdquo; command of rogue; the
-second is with the &ldquo;ROGUEOPTS&rdquo; environment
-variable.
-
-## 8.1.1. Using the &lsquo;o&rsquo; command
-
-When you type &ldquo;o&rdquo; in rogue, it
+When you type `o` in rogue, it
 clears the screen and displays the current settings for all
 the options. It then places the cursor by the value of the
 first option and waits for you to type. You can type a
-&lt;RETURN&gt; which means to go to the next
-option, a &ldquo;&minus;&rdquo; which means to go to the
-previous option, an &lt;ESCAPE&gt; which
+`Enter` which means to go to the next
+option, a `-` which means to go to the
+previous option, an `Esc` which
 means to return to the game, or you can give the option a
 value. For boolean options this merely involves typing
-&ldquo;t&rdquo; for true or &ldquo;f&rdquo; for false. For
+`t` for true or `f` for false. For
 string options, type the new value followed by a
-&lt;RETURN&gt; .
-
-### 8.1.2. Using the ROGUEOPTS variable
-
-The ROGUEOPTS variable is a string
-containing a comma separated list of initial values for the
-various options. Boolean variables can be turned on by
-listing their name or turned off by putting a
-&ldquo;no&rdquo; in front of the name. Thus to set up an
-environment variable so that <b>jump</b> is on, <b>terse</b>
-is off, and the <b>name</b> is set to &ldquo;Blue
-Meanie&rdquo;, use the command<sup>4</sup>
-
-```
-% setenv ROGUEOPTS "jump,noterse,name=Blue Meanie";
-```
+`Enter`.
 
 ## 8.2. Option list
 
@@ -408,40 +381,37 @@ options, input over fifty characters will be
 ignored.
 
 **terse** [*noterse*]
-: Useful for those who are tired of the sometimes lengthy messages of rogue. This is a useful option for playing on slow terminals, so this option defaults to *terse* if you are on a slow (1200 baud or under) terminal.
+: Useful for those who are tired of the sometimes lengthy messages of rogue.
 
 **jump** [*nojump*]
-: If this option is set, running moves will not be displayed until you reach the end of the move. This saves considerable cpu and display time. This option defaults to <i>jump</i> if you are using a slow terminal.
+: If this option is set, running moves will not be displayed until you reach the end of the move. This saves considerable cpu and display time.
 
 **flush** [*noflush**]
 : All typeahead is thrown away after each round of battle. This is useful for those who type far ahead and then watch in dismay as a Bat kills them.
 
 **seefloor** [*seefloor*]
-: Display the floor around you on the screen as you move through dark rooms. Due to the amount of characters generated, this option defaults to *noseefloor* if you are using a slow terminal.
+: Display the floor around you on the screen as you move through dark rooms.
 
 **passgo** [*nopassgo*]
 : Follow turnings in passageways. If you run in a passage and you run into stone or a wall, rogue will see if it can turn to the right or left. If it can only turn one way, it will turn that way. If it can turn either or neither, it will stop. This algorithm can sometimes lead to slightly confusing occurrences which is why it defaults to *nopassgo*.
 
 **tombstone** [*tombstone*]
-: Print out the tombstone at the end if you get killed. This is nice but slow, so you can turn it off if you like.
+: Print out the tombstone at the end if you get killed. 
 
 **inven** [*overwrite*]
 : Inventory type. This can have one of three
 values: *overwrite*, *slow*, or *clear*. With
 *overwrite* the top lines of the map are overwritten
 with the list when inventory is requested or when
-&ldquo;Which item do you wish to <b>. . .</b>? &rdquo;
+&ldquo;Which item do you wish to **. . .**?&rdquo;
 questions are answered with a &ldquo;*&rdquo;. However, if
 the list is longer than a screenful, the screen is cleared.
 With *slow*, lists are displayed one item at a time on
 the top of the screen, and with *clear*, the screen is
 cleared, the list is displayed, and then the dungeon level
-is re-displayed. Due to speed considerations, *clear*
-is the default for terminals without clear-to-end-of-line
-capabilities.
+is re-displayed.
 
-**name** [account
-name]
+**name** [account name]
 : This is the name of your character. It is
 used if you get on the top ten scorer&rsquo;s
 list.
@@ -453,10 +423,8 @@ in a couple of places.
 
 **file** [*~/rogue.save*]
 : The default file name for saving the game.
-If your phone is hung up by accident, rogue will
-automatically save the game in this file. The file name may
-start with the special character &ldquo;~&rdquo; which
-expands to be your home directory.
+If you trun off the PicoCalc, rogue will
+automatically save the game in this file.
 
 ## 9. Scoring
 
@@ -466,26 +434,18 @@ it is set up, it can post either the top scores or the top
 players. In the latter case, each account on the machine can
 post only one non-winning score on this list. If you score
 higher than someone else on this list, or better your previous score on the list, you will be inserted in the proper
-place under your current name. How many scores are kept can
-also be set up by whoever installs it on your
-machine.
+place under your current name.
 
 If you quit the game, you get out with all
 of your gold intact. If, however, you get killed in the
 Dungeons of Doom, your body is forwarded to your
 next-of-kin, along with 90% of your gold; ten percent of
-your gold is kept by the Dungeons&rsquo; wizard as a fee<sup>5</sup>. This should make you
+your gold is kept by the Dungeons&rsquo; wizard as a fee<sup>4</sup>. This should make you
 consider whether you want to take one last hit at that
 monster and possibly live, or quit and thus stop with
 whatever you have. If you quit, you do get all your gold,
 but if you swing and live, you might find
 more.
-
-If you just want to see what the current top players/games list is, you can
-type
-```
-% @PROGRAM@ &minus;s
-```
 
 ## 10. Acknowledgements
 
@@ -505,8 +465,6 @@ Mom.
 | <sup>&dagger;</sup> | UNIX is a registered trademark of The Open Group |
 | <sup>1</sup> | As opposed to pseudo English sentences. |
 | <sup>2</sup> | A minimum screen size of 24 lines by 80 columns is required. If the screen is larger, only the 24x80 section will be used for the map. |
-| <sup>3</sup> | The term "rogue" refers to a class of computer games that are characterized by their procedurally generated levels and permadeath mechanics. |
-| <sup>4</sup> | Actually, it's a dialect spoken only by the twenty-seven members of a tribe in Outer Mongolia, but you're not supposed to know that. |
-| <sup>5</sup> | For those of you who use the Bourne shell sh (1), the commands would be `$ ROGUEOPTS="jump,noterse,name=Blue Meanie" && export ROGUEOPTS`
-| <sup>5</sup> | The Dungeon's wizard is named Wally the Wonder Badger. Invocations should be accompanied by a sizable donation. |
+| <sup>3</sup> | Actually, it's a dialect spoken only by the twenty-seven members of a tribe in Outer Mongolia, but you're not supposed to know that. |
+| <sup>4</sup> | The Dungeon's wizard is named Wally the Wonder Badger. Invocations should be accompanied by a sizable donation. |
 
