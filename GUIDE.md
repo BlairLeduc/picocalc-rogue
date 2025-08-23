@@ -500,6 +500,8 @@ teeming multitudes who graciously ignored work, school, and
 social life to play rogue and send us bugs, complaints, suggestions, and just plain flames. And also
 Mom.
 
+| | |
+|---|---|
 | <sup>&dagger;</sup> | UNIX is a registered trademark of The Open Group |
 | <sup>1</sup> | As opposed to pseudo English sentences. |
 | <sup>2</sup> | A minimum screen size of 24 lines by 80 columns is required. If the screen is larger, only the 24x80 section will be used for the map. |
