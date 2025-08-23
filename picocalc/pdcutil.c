@@ -15,6 +15,7 @@ const char *PDC_sysname(void)
 
 void PDC_napms(int ms)
 {
+    tight_loop_contents();
     sleep_ms(ms);
 }
 

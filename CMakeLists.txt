@@ -61,6 +61,25 @@ file(GLOB PICOCALC_SOURCES CONFIGURE_DEPENDS
     picocalc/*.c
 )
 
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_LIST_DIR}/rogue/.patched
+    COMMAND ${CMAKE_COMMAND} -E rm -rf ${CMAKE_CURRENT_LIST_DIR}/rogue
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_LIST_DIR}/modules/rogue
+            ${CMAKE_CURRENT_LIST_DIR}/rogue
+    COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/scripts/apply_patches.sh
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_LIST_DIR}/rogue/.patched
+    DEPENDS ${CMAKE_CURRENT_LIST_DIR}/patches/rogue.patch
+            ${CMAKE_CURRENT_LIST_DIR}/scripts/apply_patches.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    COMMENT "Copying and patching rogue sources"
+    VERBATIM
+)
+
+add_custom_target(patch_rogue ALL
+    DEPENDS ${CMAKE_CURRENT_LIST_DIR}/rogue/.patched
+)
+
 file(GLOB ROGUE_SOURCES CONFIGURE_DEPENDS
     rogue/*.c
 )
@@ -70,7 +89,10 @@ add_executable(picocalc-rogue
     ${STARTER_KIT_SOURCES}
     ${PICOCALC_SOURCES}
     ${ROGUE_SOURCES}
+    main.c
     )
+
+add_dependencies(picocalc-rogue patch_rogue)
 
 pico_set_program_name(picocalc-rogue "picocalc-rogue")
 pico_set_program_version(picocalc-rogue "0.1")

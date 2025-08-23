@@ -41,13 +41,21 @@ static struct
         {PC_KEY_F9, KEY_F(9), 0, 0, 0},
         {PC_KEY_F10, KEY_F(10), 0, 0, 0},
         {PC_KEY_DEL, KEY_DC, 0, 0, 0},
-        {PC_KEY_RETURN, KEY_ENTER, 0, 0, 0},
+        {PC_KEY_RETURN, 0x0A, 0, 0, 0},
+        {PC_KEY_ENTER, 0x0A, 0, 0, 0},
         {PC_KEY_ESC, 0x1b, 0, 0, 0}};
 
 static uint16_t _lookup_key(int keycode, bool shifted, bool control, bool alt)
 {
     if (keycode >= 0x20 && keycode <= 0x7F)
     {
+        if (keycode >= 'a' && keycode <= 'z')
+        {
+            if (control)
+            {
+                return keycode & 0x1F; // Control-A to Control-Z
+            }
+        }
         return keycode; // ASCII range
     }
 
