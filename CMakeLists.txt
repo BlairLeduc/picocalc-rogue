@@ -33,20 +33,12 @@ project(picocalc-rogue C CXX ASM)
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_LIST_DIR}/modules/rogue
-    ${CMAKE_CURRENT_LIST_DIR}/rogue)
-
-# Apply patches
-execute_process(COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/scripts/apply_patches.sh 
-    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
-
 # Add executable. Default name is the project name, version 0.1
 file(GLOB PDCURSES_SOURCES CONFIGURE_DEPENDS
     modules/PDCurses/pdcurses/*.c
 )
 
-file(GLOB STARTER_KIT_SOURCES CONFIGURE_DEPENDS
+set(STARTER_KIT_SOURCES
     modules/picocalc-text-starter/drivers/audio.c
     modules/picocalc-text-starter/drivers/clib.c
     modules/picocalc-text-starter/drivers/fat32.c
@@ -130,4 +122,3 @@ target_include_directories(picocalc-rogue PRIVATE
 )
 
 pico_add_extra_outputs(picocalc-rogue)
-
