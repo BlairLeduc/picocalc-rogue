@@ -1,4 +1,5 @@
 #include "pdcpicocalc.h"
+#include "rogue.h"
 
 void PDC_gotoyx(int y, int x)
 {
@@ -16,10 +17,24 @@ void PDC_transform_line(int lineno, int x, int len, const chtype *srcp)
 {
     PDC_LOG(("PDC_transform_line() - called: lineno=%d\n", lineno));
 
-    uint8_t col = x;
-    uint8_t row = lineno;
-    for (int i = 0; i < len; i++)
+    if (!len)
+        return;
+
+    if (len == 1)
     {
-        lcd_putc(col + i, row, srcp[i] & 0x7F);
+        lcd_putc(x, lineno, *srcp & 0x7F);
+        return;
     }
+
+    char buffer[NUMCOLS + 1];
+    char *bptr = buffer;
+
+    for (int i = 0; i < len && i < NUMCOLS; i++)
+    {
+       *bptr++ = *srcp++ & 0x7F;
+    }
+    *bptr = '\0';
+
+    // Now we can use the buffer
+    lcd_putstr(x, lineno, buffer);
 }

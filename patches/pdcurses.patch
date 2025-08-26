@@ -1,0 +1,17 @@
+--- a/pdcurses/getch.c	2025-08-25 14:45:31
++++ b/pdcurses/getch.c	2025-08-25 14:45:08
+@@ -351,10 +351,10 @@
+     /* refresh window when wgetch is called if there have been changes
+        to it and it is not a pad */
+ 
+-    if (!(win->_flags & _PAD) && ((!win->_leaveit &&
+-         (win->_begx + win->_curx != SP->curscol ||
+-          win->_begy + win->_cury != SP->cursrow)) || is_wintouched(win)))
+-        wrefresh(win);
++    // if (!(win->_flags & _PAD) && ((!win->_leaveit &&
++    //      (win->_begx + win->_curx != SP->curscol ||
++    //       win->_begy + win->_cury != SP->cursrow)) || is_wintouched(win)))
++    //     wrefresh(win);
+ 
+     /* if ungotten char exists, remove and return it */
+ 

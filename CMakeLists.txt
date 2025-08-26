@@ -23,8 +23,8 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-set(PICO_BOARD pico CACHE STRING "Board type")
-set(PICOCALC_ROGUE_VERSION "0.1" CACHE STRING "PicoCalc Rogue version")
+set(PICO_BOARD pimoroni_pico_plus2_w_rp2350 CACHE STRING "Board type")
+set(PICOCALC_ROGUE_VERSION "0.2" CACHE STRING "PicoCalc Rogue version")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
@@ -33,11 +33,6 @@ project(picocalc-rogue C CXX ASM)
 
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
-
-# Add executable. Default name is the project name, version 0.1
-file(GLOB PDCURSES_SOURCES CONFIGURE_DEPENDS
-    modules/PDCurses/pdcurses/*.c
-)
 
 set(STARTER_KIT_SOURCES
     modules/picocalc-text-starter/drivers/audio.c
@@ -60,10 +55,10 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_CURRENT_LIST_DIR}/modules/rogue
             ${CMAKE_CURRENT_LIST_DIR}/rogue
-    COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/scripts/apply_patches.sh
+    COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/scripts/apply_rogue_patches.sh
     COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_LIST_DIR}/rogue/.patched
     DEPENDS ${CMAKE_CURRENT_LIST_DIR}/patches/rogue.patch
-            ${CMAKE_CURRENT_LIST_DIR}/scripts/apply_patches.sh
+            ${CMAKE_CURRENT_LIST_DIR}/scripts/apply_rogue_patches.sh
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     COMMENT "Copying and patching rogue sources"
     VERBATIM
@@ -77,6 +72,29 @@ file(GLOB ROGUE_SOURCES CONFIGURE_DEPENDS
     rogue/*.c
 )
 
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_LIST_DIR}/pdcurses/.patched
+    COMMAND ${CMAKE_COMMAND} -E rm -rf ${CMAKE_CURRENT_LIST_DIR}/pdcurses
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_LIST_DIR}/modules/PDCurses/pdcurses
+            ${CMAKE_CURRENT_LIST_DIR}/pdcurses
+    COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/scripts/apply_pdcurses_patches.sh
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_LIST_DIR}/pdcurses/.patched
+    DEPENDS ${CMAKE_CURRENT_LIST_DIR}/patches/pdcurses.patch
+            ${CMAKE_CURRENT_LIST_DIR}/scripts/apply_pdcurses_patches.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    COMMENT "Copying and patching pdcurses sources"
+    VERBATIM
+)
+
+add_custom_target(patch_pdcurses ALL
+    DEPENDS ${CMAKE_CURRENT_LIST_DIR}/pdcurses/.patched
+)
+
+file(GLOB PDCURSES_SOURCES CONFIGURE_DEPENDS
+    pdcurses/*.c
+)
+
 add_executable(picocalc-rogue
     ${PDCURSES_SOURCES}
     ${STARTER_KIT_SOURCES}
@@ -85,8 +103,9 @@ add_executable(picocalc-rogue
     main.c
     )
 
-add_dependencies(picocalc-rogue patch_rogue)
+add_dependencies(picocalc-rogue patch_rogue patch_pdcurses)
 
+# Add executable. Default name is the project name, version, url
 pico_set_program_name(picocalc-rogue "picocalc-rogue")
 pico_set_program_version(picocalc-rogue "${PICOCALC_ROGUE_VERSION}")
 pico_set_program_url(picocalc-rogue "https://github.com/BlairLeduc/picocalc-rogue")
@@ -124,6 +143,7 @@ target_link_libraries(picocalc-rogue
 target_include_directories(picocalc-rogue PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/rogue
+    ${CMAKE_CURRENT_LIST_DIR}/pdcurses
     ${CMAKE_CURRENT_LIST_DIR}/modules/PDCurses
     ${CMAKE_CURRENT_LIST_DIR}/modules/picocalc-text-starter
     ${CMAKE_CURRENT_LIST_DIR}/picocalc

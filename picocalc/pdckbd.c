@@ -9,7 +9,7 @@ static volatile uint16_t rx_buffer[KBD_BUFFER_SIZE];
 static volatile uint16_t rx_head = 0;
 static volatile uint16_t rx_tail = 0;
 static volatile bool flush = false;
-static repeating_timer_t key_timer;
+repeating_timer_t key_timer;
 
 static struct
 {
@@ -75,7 +75,7 @@ static uint16_t _lookup_key(int keycode, bool shifted, bool control, bool alt)
     return 0;
 }
 
-static bool on_keyboard_timer(repeating_timer_t *rt)
+bool on_keyboard_timer(repeating_timer_t *rt)
 {
     uint16_t key = 0;
     uint8_t key_state = 0;
