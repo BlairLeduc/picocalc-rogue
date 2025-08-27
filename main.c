@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "hardware/watchdog.h"
 
@@ -22,13 +23,15 @@ extern repeating_timer_t key_timer;
 extern bool PDC_check_key(void);
 extern int PDC_get_key(void);
 extern void PDC_flushinp(void);
+extern char **environ;
 
 static char* argv_restore[] = {
     "rogue",
     "-r"
 };
 
-static char* environment[] = {};
+#define MAX_ENV_VARS 16
+static char* environment[MAX_ENV_VARS + 1] = {0};
 
 void picocalc_reboot(int status)
 {
@@ -182,6 +185,41 @@ int main(int argc, char **argv, char **envp)
         argv = argv_restore;
     }
     
+    FILE *envFile = fopen("/Rogue/rogue.env", "r");
+    if (envFile)
+    {
+        // read environment variables
+        char line[256];
+        int pos = 0;
+        while (fgets(line, sizeof(line), envFile))
+        {
+            // ignore the whitespace at the start of the line
+            char *trimmed = line;
+            while (isspace(*trimmed))
+            {
+                trimmed++;
+            }
+            if (strlen(trimmed) == 0 || trimmed[0] == '#' || strchr(trimmed, '=') == NULL)
+            {
+                continue; // Skip empty lines, comments, and invalid lines
+            }
+
+            char *envLine = malloc(strlen(trimmed) + 1);
+            if (envLine)
+            {
+                strcpy(envLine, trimmed);
+                environment[pos++] = envLine;
+            }
+            if (pos >= MAX_ENV_VARS)
+            {
+                break;
+            }
+        }
+        fclose(envFile);
+    }
+
+    environ = environment;
+
     // Start the original rogue main
     rogue_main(argc, argv, environment);
 

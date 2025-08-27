@@ -357,7 +357,13 @@ conceptions of the way rogue should do things, there are a
 set of options you can set that cause rogue to behave in
 various different ways.
 
-## 8.1 Setting the options
+### 8.1.  Setting the options
+
+There  are  two  ways to set the options.  The first is
+with the "o" command  of  rogue;  the  second  is  with  the
+"ROGUEOPTS" environment variable.
+
+#### 8.1.1.  Using the `o' command
 
 When you type `o` in rogue, it
 clears the screen and displays the current settings for all
@@ -371,6 +377,19 @@ value. For boolean options this merely involves typing
 `t` for true or `f` for false. For
 string options, type the new value followed by a
 `Enter`.
+
+### 8.1.2.  Using the ROGUEOPTS variable
+
+The ROGUEOPTS variable is a string containing  a  comma
+separated  list  of  initial values for the various options.
+Boolean variables can be turned on by listing their name  or
+turned  off by putting a "no" in front of the name.  Thus to
+set up an environment variable so that jump is on, terse  is
+off, and the name is set to "Blue Meanie", use the text
+
+    ROGUEOPTS=jump,noterse,name=Blue Meanie
+
+Place this text in the `/Rogue/rogue.env` file.
 
 ## 8.2. Option list
 
