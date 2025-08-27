@@ -130,7 +130,7 @@
  }
  
 --- a/rogue/rip.c	2025-08-16 17:49:39
-+++ b/rogue/rip.c	2025-08-25 20:19:19
++++ b/rogue/rip.c	2025-08-26 21:44:16
 @@ -21,6 +21,9 @@
  #include <curses.h>
  #include "rogue.h"
@@ -141,15 +141,14 @@
  
  static char *rip[] = {
  "                       __________\n",
-@@ -270,8 +273,10 @@
+@@ -268,10 +271,7 @@
+     move(LINES - 1, 0);
+     refresh();
      score(purse, amulet ? 3 : 0, monst);
-     printf("[Press return to continue]");
-     fflush(stdout);
+-    printf("[Press return to continue]");
+-    fflush(stdout);
 -    (void) fgets(prbuf,10,stdin);
 -    my_exit(0);
-+	PDC_flushinp();
-+    while (getch() != '\n')
-+	;
 +    rogue_exit(0);
  }
  
