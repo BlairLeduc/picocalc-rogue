@@ -77,39 +77,48 @@ int main(int argc, char **argv, char **envp)
     snprintf(buffer, sizeof(buffer), "Version %s. Port to PicoCalc v%s.", release, PICOCALC_ROGUE_VERSION);
     lcd_putstr((64 - strlen(buffer)) >> 1, 4, buffer);
 
-    // Display top ten scores
-    lcd_putstr(24, 8, "Top Ten Scores");
-    lcd_putstr(4, 10, "Score");
-    lcd_putstr(11, 10, "Name                                                ");
-
-    SCORE *top_ten = (SCORE *) malloc(numscores * sizeof (SCORE));
-    SCORE *endp = &top_ten[numscores];
-    open_score();
-    rd_score(top_ten);
-
-    int y = 11;
-    for (SCORE *scp = top_ten; scp < endp; scp++)
+    SCORE *top_ten = (SCORE *)calloc(numscores, sizeof(SCORE));
+    if (top_ten)
     {
-        if (scp->sc_score == 0)
-            break;
+        // Display top ten scores
+        lcd_putstr(24, 8, "Top Ten Scores");
+        lcd_putstr(4, 10, "Score");
+        lcd_putstr(11, 10, "Name                                                ");
 
-        if (scp->sc_flags == 0 || scp->sc_flags == 3)
+
+        SCORE *endp = &top_ten[numscores];
+        open_score();
+        rd_score(top_ten);
+
+        int y = 11;
+        for (SCORE *scp = top_ten; scp < endp; scp++)
         {
-            snprintf(buffer, sizeof(buffer),
-                "%2d  %5d  %s: %s on level %d by %s.",
-                (int) (scp - top_ten + 1), scp->sc_score,
-                scp->sc_name, reason[scp->sc_flags],
-                scp->sc_level, killname((char) scp->sc_monster, TRUE));
+            if (scp->sc_score == 0)
+                break;
+
+            if (scp->sc_flags == 0 || scp->sc_flags == 3)
+            {
+                snprintf(buffer, sizeof(buffer),
+                    "%2d  %5d  %s: %s on level %d by %s.",
+                    (int) (scp - top_ten + 1), scp->sc_score,
+                    scp->sc_name, reason[scp->sc_flags],
+                    scp->sc_level, killname((char) scp->sc_monster, TRUE));
+            }
+            else
+            {
+                snprintf(buffer, sizeof(buffer),
+                    "%2d  %5d  %s: %s on level %d.",
+                    (int) (scp - top_ten + 1), scp->sc_score,
+                    scp->sc_name, reason[scp->sc_flags],
+                    scp->sc_level);
+            }
+            lcd_putstr(0, y++, buffer);
         }
-        else
-        {
-            snprintf(buffer, sizeof(buffer),
-                "%2d  %5d  %s: %s on level %d.",
-                (int) (scp - top_ten + 1), scp->sc_score,
-                scp->sc_name, reason[scp->sc_flags],
-                scp->sc_level);
-        }
-        lcd_putstr(0, y++, buffer);
+        free(top_ten);
+    }
+    else
+    {
+        lcd_putstr(14, 8, "Error allocating memory for scores.");
     }
 
     // Show battery status, bottom corner
