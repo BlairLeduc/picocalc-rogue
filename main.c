@@ -116,6 +116,10 @@ int main(int argc, char **argv, char **envp)
         }
         free(top_ten);
     }
+    else
+    {
+        lcd_putstr(14, 8, "Error allocating memory for scores.");
+    }
 
     // Show battery status, bottom corner
     int raw_level = sb_read_battery();
