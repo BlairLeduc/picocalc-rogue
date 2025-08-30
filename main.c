@@ -60,13 +60,10 @@ void rogue_exit(int status)
         char *msg = power_off_msgs[get_rand_32() % (sizeof(power_off_msgs) / sizeof(char *))];
         lcd_putstr((64 - strlen(msg)) >> 1, 16, msg);
 
-        if (sb_is_power_off_supported())
+        sb_write_power_off_delay(6);
+        while (1)
         {
-            sb_write_power_off_delay(6);
-            while (1)
-            {
-                tight_loop_contents();
-            }
+            tight_loop_contents();
         }
     }
 
