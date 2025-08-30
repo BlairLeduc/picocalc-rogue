@@ -3,6 +3,7 @@
 #include <ctype.h>
 
 #include "hardware/watchdog.h"
+#include "pico/rand.h"
 
 #include <drivers/audio.h>
 #include <drivers/fat32.h>
@@ -16,7 +17,6 @@
 #include "config.h"
 #include "score.h"
 
-
 extern int rogue_main(int argc, char **argv, char **envp);
 extern bool on_keyboard_timer(repeating_timer_t *rt);
 extern repeating_timer_t key_timer;
@@ -25,13 +25,25 @@ extern int PDC_get_key(void);
 extern void PDC_flushinp(void);
 extern char **environ;
 
-static char* argv_restore[] = {
+static char *argv_restore[] = {
     "rogue",
-    "-r"
-};
+    "-r"};
+
+static char *power_off_msgs[] = {
+    "Nice session!",
+    "Play again soon!",
+    "Until next time!",
+    "Great effort!",
+    "Great job!",
+    "Goodbye!",
+    "That was fun!",
+    "You did great!",
+    "Continue tomorrow?",
+    "Adventure resumes on your return.",
+    "Thanks for playing! Continue anytime."};
 
 #define MAX_ENV_VARS 16
-static char* environment[MAX_ENV_VARS + 1] = {0};
+static char *environment[MAX_ENV_VARS + 1] = {0};
 
 void picocalc_reboot(int status)
 {
@@ -40,7 +52,24 @@ void picocalc_reboot(int status)
 
 void rogue_exit(int status)
 {
+    lcd_enable_cursor(false);
     lcd_clear_screen();
+
+    if (status && sb_is_power_off_supported())
+    {
+        char *msg = power_off_msgs[get_rand_32() % (sizeof(power_off_msgs) / sizeof(char *))];
+        lcd_putstr((64 - strlen(msg)) >> 1, 16, msg);
+
+        if (sb_is_power_off_supported())
+        {
+            sb_write_power_off_delay(6);
+            while (1)
+            {
+                tight_loop_contents();
+            }
+        }
+    }
+
     picocalc_reboot(status);
 }
 
@@ -51,8 +80,7 @@ int main(int argc, char **argv, char **envp)
         "killed",
         "quit",
         "A total winner",
-        "killed with Amulet"
-    };
+        "killed with Amulet"};
 
     // Initialise PicoCalc hardware
     sb_init();
@@ -85,7 +113,6 @@ int main(int argc, char **argv, char **envp)
         lcd_putstr(4, 10, "Score");
         lcd_putstr(11, 10, "Name                                                ");
 
-
         SCORE *endp = &top_ten[numscores];
         open_score();
         rd_score(top_ten);
@@ -99,18 +126,18 @@ int main(int argc, char **argv, char **envp)
             if (scp->sc_flags == 0 || scp->sc_flags == 3)
             {
                 snprintf(buffer, sizeof(buffer),
-                    "%2d  %5d  %s: %s on level %d by %s.",
-                    (int) (scp - top_ten + 1), scp->sc_score,
-                    scp->sc_name, reason[scp->sc_flags],
-                    scp->sc_level, killname((char) scp->sc_monster, TRUE));
+                         "%2d  %5d  %s: %s on level %d by %s.",
+                         (int)(scp - top_ten + 1), scp->sc_score,
+                         scp->sc_name, reason[scp->sc_flags],
+                         scp->sc_level, killname((char)scp->sc_monster, TRUE));
             }
             else
             {
                 snprintf(buffer, sizeof(buffer),
-                    "%2d  %5d  %s: %s on level %d.",
-                    (int) (scp - top_ten + 1), scp->sc_score,
-                    scp->sc_name, reason[scp->sc_flags],
-                    scp->sc_level);
+                         "%2d  %5d  %s: %s on level %d.",
+                         (int)(scp - top_ten + 1), scp->sc_score,
+                         scp->sc_name, reason[scp->sc_flags],
+                         scp->sc_level);
             }
             lcd_putstr(0, y++, buffer);
         }
@@ -126,9 +153,14 @@ int main(int argc, char **argv, char **envp)
     snprintf(buffer, sizeof(buffer), "Battery: %d%%%s", raw_level & 0x7F, (raw_level & 0x80) ? " (Charging)" : "");
     lcd_putstr(64 - strlen(buffer), 31, buffer);
 
+    strncpy(home, md_gethomedir(), MAXSTR);
+
+    strcpy(file_name, home);
+    strcat(file_name, "rogue.save");
+
     fat32_file_t file;
     bool found_save = false;
-    if (fat32_open(&file, "/Rogue/rogue.save") == FAT32_OK)
+    if (fat32_open(&file, file_name) == FAT32_OK)
     {
         // File opened successfully
         fat32_close(&file);
@@ -193,7 +225,7 @@ int main(int argc, char **argv, char **envp)
         argc = 2;
         argv = argv_restore;
     }
-    
+
     FILE *envFile = fopen("/Rogue/rogue.env", "r");
     if (envFile)
     {
