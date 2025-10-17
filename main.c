@@ -99,8 +99,10 @@ int main(int argc, char **argv, char **envp)
 
     // Show version
     lcd_set_font(&font_5x10);
-    snprintf(buffer, sizeof(buffer), "Version %s. Port to PicoCalc v%s.", release, PICOCALC_ROGUE_VERSION);
+    snprintf(buffer, sizeof(buffer), "Version %s", release);
     lcd_putstr((64 - strlen(buffer)) >> 1, 4, buffer);
+    snprintf(buffer, sizeof(buffer), "PicoCalc v%s Port Copyright 2025 Blair Leduc", PICOCALC_ROGUE_VERSION);
+    lcd_putstr((64 - strlen(buffer)) >> 1, 5, buffer);
 
     SCORE *top_ten = (SCORE *)calloc(numscores, sizeof(SCORE));
     if (top_ten)
