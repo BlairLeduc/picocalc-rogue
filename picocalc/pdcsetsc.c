@@ -13,3 +13,27 @@ int PDC_curs_set(int visibility)
 
     return ret_vis;
 }
+
+int PDC_set_blink(bool blinkon)
+{
+    if (!SP)
+    {
+        return ERR;
+    }
+
+    if (SP->color_started)
+    {
+        COLORS = 8;
+    }
+
+    if (blinkon)
+    {
+        SP->termattrs |= A_BLINK;
+    }
+    else
+    {
+        SP->termattrs &= ~A_BLINK;
+    }
+
+    return OK;
+}

@@ -1,7 +1,7 @@
 #include "pdcpicocalc.h"
 
-uint16_t cols = 64;
-uint16_t rows = 32;
+static uint16_t cols = 64;
+static uint16_t rows = 32;
 
 int PDC_get_columns(void)
 {

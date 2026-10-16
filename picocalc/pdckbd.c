@@ -142,12 +142,18 @@ bool on_keyboard_timer(repeating_timer_t *rt)
     return true; // continue the timer
 }
 
+static bool key_timer_running = false;
+
 void PDC_set_keyboard_binary(bool on)
 {
     PDC_LOG(("PDC_set_keyboard_binary() - called\n"));
 
-    // poll every 100 ms for key events
-    add_repeating_timer_ms(100, on_keyboard_timer, NULL, &key_timer);
+    if (!key_timer_running)
+    {
+        // poll every 100 ms for key events
+        add_repeating_timer_ms(100, on_keyboard_timer, NULL, &key_timer);
+        key_timer_running = true;
+    }
 }
 
 bool PDC_check_key(void)

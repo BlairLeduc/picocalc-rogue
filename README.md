@@ -1,6 +1,6 @@
 # PicoCalc Rogue
 
-A port of the classic [Rogue 5.4.4](http://rogue.rogueforge.net/rogue-5-4/) to the [PicoCalc kit](https://www.clockworkpi.com/product-page/picocalc).
+A port of the classic [Rogue 5.4.4](https://github.com/Davidslv/rogue) to the [PicoCalc kit](https://www.clockworkpi.com/product-page/picocalc).
 
 # Exploring The Dungeons of Doom
 

@@ -15,6 +15,12 @@ int PDC_scr_open(void)
     SP->termattrs = A_UNDERLINE | A_REVERSE | A_BOLD;
     SP->_preserve = FALSE;
 
+    PDC_resize_screen(PDC_get_rows(), PDC_get_columns());
+    PDC_set_keyboard_binary(true);
+
+    lcd_clear_screen();
+    lcd_enable_cursor(true);
+
     return OK;
 }
 
