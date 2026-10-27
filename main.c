@@ -17,6 +17,10 @@
 #include "config.h"
 #include "score.h"
 
+#if PICO_RP2350
+#include "picocalc_shell.h"
+#endif
+
 extern int rogue_main(int argc, char **argv, char **envp);
 extern bool on_keyboard_timer(repeating_timer_t *rt);
 extern repeating_timer_t key_timer;
@@ -45,9 +49,58 @@ static char *power_off_msgs[] = {
 #define MAX_ENV_VARS 16
 static char *environment[MAX_ENV_VARS + 1] = {0};
 
+static char *menu_labels[] = {
+    " New Game ",
+    " Continue ",
+    "   Exit   "};
+
 void picocalc_reboot(int status)
 {
     watchdog_reboot(0, 0, 0); // Reboot the device
+}
+
+// Whether UF2 Loader can load /BOOT2350.UF2 (the shell or the loader's menu)
+static bool loader_available(void)
+{
+#if !PICO_RP2350
+    return false;
+#elif PICO_NO_FLASH
+    // Running from SRAM, so stage3 loaded us; only the card matters
+    return picocalc_shell_card_present();
+#else
+    return picocalc_shell_loader_present() && picocalc_shell_card_present();
+#endif
+}
+
+// Reboot into /BOOT2350.UF2; call loader_available() first
+static void return_to_loader(void)
+{
+#if PICO_RP2350
+    // As picocalc_shell_exit(), less its check for a program in flash
+    watchdog_hw->scratch[1] = PICOCALC_SHELL_BOOT_SD;
+    watchdog_hw->scratch[2] = 0;
+    watchdog_hw->scratch[0] = PICOCALC_SHELL_LOADER_MAGIC;
+    watchdog_reboot(0, 0, 0);
+    while (1)
+    {
+        tight_loop_contents();
+    }
+#endif
+}
+
+// Show why the saved game could not be restored, and wait for a key
+void rogue_restore_failed(const char *reason)
+{
+    static const char *prompt = "Your saved game has been kept. Press any key.";
+
+    lcd_enable_cursor(false);
+    lcd_set_font(&font_5x10);
+    lcd_clear_screen();
+    lcd_putstr((64 - strlen(reason)) >> 1, 14, reason);
+    lcd_putstr((64 - strlen(prompt)) >> 1, 16, prompt);
+
+    PDC_flushinp();
+    PDC_get_key();
 }
 
 void rogue_exit(int status)
@@ -55,17 +108,38 @@ void rogue_exit(int status)
     lcd_enable_cursor(false);
     lcd_clear_screen();
 
-    if (status && sb_is_power_off_supported())
+    // Saved or quit: return to the loader, or power off, after time to read the message
+    bool to_loader = status && loader_available();
+    bool power_off = status && !to_loader && sb_is_power_off_supported();
+
+    if (to_loader || power_off)
     {
         char *msg = power_off_msgs[get_rand_32() % (sizeof(power_off_msgs) / sizeof(char *))];
         lcd_putstr((64 - strlen(msg)) >> 1, 16, msg);
+    }
 
+    if (to_loader)
+    {
+        sleep_ms(5000);
+        return_to_loader();
+    }
+
+    if (power_off)
+    {
         sb_write_power_off_delay(6);
         while (1)
         {
             tight_loop_contents();
         }
     }
+
+#if PICO_NO_FLASH
+    // A reboot would start the program in flash, not this one
+    if (loader_available())
+    {
+        return_to_loader();
+    }
+#endif
 
     picocalc_reboot(status);
 }
@@ -166,27 +240,26 @@ int main(int argc, char **argv, char **envp)
         found_save = true;
     }
 
-    // New Game | Continue
-    int options = 1;
-    int selected = 0;
-
-    if (!found_save)
-    {
-        lcd_set_reverse(true);
-    }
-    lcd_putstr(26, 25, " New Game ");
-    if (!found_save)
-    {
-        lcd_set_reverse(false);
-    }
+    // New Game | Continue | Exit
+    int items[3];
+    int options = 0;
+    items[options++] = 0;
     if (found_save)
     {
-        options++;
-        selected = 1;
-        lcd_set_reverse(true);
-        lcd_putstr(26, 26, " Continue ");
-        lcd_set_reverse(false);
+        items[options++] = 1;
     }
+    if (loader_available())
+    {
+        items[options++] = 2;
+    }
+    int selected = found_save ? 1 : 0;
+
+    for (int i = 0; i < options; i++)
+    {
+        lcd_set_reverse(i == selected);
+        lcd_putstr(26, 25 + i, menu_labels[items[i]]);
+    }
+    lcd_set_reverse(false);
 
     PDC_flushinp();
 
@@ -198,27 +271,33 @@ int main(int argc, char **argv, char **envp)
         {
             // Move selection up
             lcd_set_reverse(false);
-            lcd_putstr(26, 25 + selected, (selected == 0) ? " New Game " : " Continue ");
+            lcd_putstr(26, 25 + selected, menu_labels[items[selected]]);
             selected--;
             lcd_set_reverse(true);
-            lcd_putstr(26, 25 + selected, (selected == 0) ? " New Game " : " Continue ");
+            lcd_putstr(26, 25 + selected, menu_labels[items[selected]]);
             lcd_set_reverse(false);
         }
         else if (ch == 'j' && selected < options - 1)
         {
             // Move selection down
             lcd_set_reverse(false);
-            lcd_putstr(26, 25 + selected, (selected == 0) ? " New Game " : " Continue ");
+            lcd_putstr(26, 25 + selected, menu_labels[items[selected]]);
             selected++;
             lcd_set_reverse(true);
-            lcd_putstr(26, 25 + selected, (selected == 0) ? " New Game " : " Continue ");
+            lcd_putstr(26, 25 + selected, menu_labels[items[selected]]);
             lcd_set_reverse(false);
         }
     } while (ch != '\n' && ch != ' ');
 
+    if (items[selected] == 2)
+    {
+        lcd_clear_screen();
+        return_to_loader();
+    }
+
     lcd_enable_cursor(true);
 
-    if (selected == 1)
+    if (items[selected] == 1)
     {
         // Tell rogue to load the saved game
         argc = 2;

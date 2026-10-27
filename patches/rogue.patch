@@ -79,7 +79,7 @@
  	    max_stats.s_str, 10 - s_arm, pstats.s_lvl, pstats.s_exp,
  	    state_name[hungry_state]);
 --- a/rogue/main.c	2025-08-23 15:54:36
-+++ b/rogue/main.c	2025-08-29 21:17:44
++++ b/rogue/main.c	2026-10-27 15:12:34
 @@ -13,14 +13,17 @@
  #include <signal.h>
  #include <time.h>
@@ -99,6 +99,15 @@
  {
      char *env;
      int lowtime;
+@@ -103,7 +106,7 @@
+     init_check();			/* check for legal startup */
+     if (argc == 2)
+ 	if (!restore(argv[1], envp))	/* Note: restore will never return */
+-	    my_exit(1);
++	    my_exit(0);
+ #ifdef MASTER
+     if (wizard)
+ 	printf("Hello %s, welcome to dungeon #%d", whoami, dnum);
 @@ -185,7 +188,7 @@
  int
  rnd(int range)
@@ -159,8 +168,16 @@
  #define BORE_LEVEL	50
  
 --- a/rogue/save.c	2025-08-16 17:49:39
-+++ b/rogue/save.c	2025-08-29 21:57:03
-@@ -128,7 +128,7 @@
++++ b/rogue/save.c	2026-10-27 15:12:34
+@@ -23,6 +23,7 @@
+ typedef struct stat STAT;
+ 
+ extern char version[], encstr[];
++extern void rogue_restore_failed(const char *reason);
+ 
+ static STAT sbuf;
+ 
+@@ -128,7 +129,7 @@
      if (file_name[0] != '\0' && ((savef = fopen(file_name, "w")) != NULL ||
  	(md_unlink_open_file(file_name, savef) >= 0 && (savef = fopen(file_name, "w")) != NULL)))
  	    save_file(savef);
@@ -169,7 +186,7 @@
  }
  
  /*
-@@ -151,7 +151,7 @@
+@@ -151,7 +152,7 @@
      rs_save_file(savef);
      fflush(savef);
      fclose(savef);
@@ -178,3 +195,132 @@
  }
  
  /*
+@@ -176,17 +177,23 @@
+ 
+ 	if ((inf = fopen(file,"r")) == NULL)
+     {
+-	perror(file);
++	rogue_restore_failed("Cannot open the saved game.");
+ 	return FALSE;
+     }
+-    stat(file, &sbuf2);
++    if (stat(file, &sbuf2) < 0)
++    {
++	fclose(inf);
++	rogue_restore_failed("Cannot read the saved game's details.");
++	return FALSE;
++    }
+     syml = is_symlink(file);
+ 
+     fflush(stdout);
+     encread(buf, (unsigned) strlen(version) + 1, inf);
+     if (strcmp(buf, version) != 0)
+     {
+-	printf("Sorry, saved game is out of date.\n");
++	fclose(inf);
++	rogue_restore_failed("Sorry, saved game is out of date.");
+ 	return FALSE;
+     }
+     encread(buf,80,inf);
+@@ -195,45 +202,30 @@
+     initscr();                          /* Start up cursor package */
+     keypad(stdscr, 1);
+ 
+-    if (lines > LINES)
++    if (lines > LINES || cols > COLS)
+     {
+         endwin();
+-        printf("Sorry, original game was played on a screen with %d lines.\n",lines);
+-        printf("Current screen only has %d lines. Unable to restore game\n",LINES);
++	fclose(inf);
++	sprintf(buf, "Saved game is %d x %d; the screen is %d x %d.", lines, cols, LINES, COLS);
++	rogue_restore_failed(buf);
+         return(FALSE);
+     }
+-    if (cols > COLS)
+-    {
+-        endwin();
+-        printf("Sorry, original game was played on a screen with %d columns.\n",cols);
+-        printf("Current screen only has %d columns. Unable to restore game\n",COLS);
+-        return(FALSE);
+-    }
+ 
+     hw = newwin(LINES, COLS, 0, 0);
+     setup();
+ 
+-    rs_restore_file(inf);
+     /*
+-     * we do not close the file so that we will have a hold of the
+-     * inode for as long as possible
+-     */
+-
+-    if (
+-#ifdef MASTER
+-	!wizard &&
+-#endif
+-        md_unlink_open_file(file, inf) < 0)
++     * check everything before the saved game is deleted, so that a
++     * game that cannot be restored is not lost
++     */
++    if (rs_restore_file(inf) != 0)
+     {
+-	printf("Cannot unlink file\n");
++	endwin();
++	fclose(inf);
++	rogue_restore_failed("Cannot read the saved game.");
+ 	return FALSE;
+     }
+-    mpos = 0;
+-/*    printw(0, 0, "%s: %s", file, ctime(&sbuf2.st_mtime)); */
+-/*
+-    printw("%s: %s", file, ctime(&sbuf2.st_mtime));
+-*/
+-    clearok(stdscr,TRUE);
++
+     /*
+      * defeat multiple restarting from the same place
+      */
+@@ -243,17 +235,41 @@
+ 	if (sbuf2.st_nlink != 1 || syml)
+ 	{
+ 	    endwin();
+-	    printf("\nCannot restore from a linked file\n");
++	    fclose(inf);
++	    rogue_restore_failed("Cannot restore from a linked file.");
+ 	    return FALSE;
+ 	}
+ 
+     if (pstats.s_hpt <= 0)
+     {
+ 	endwin();
+-	printf("\n\"He's dead, Jim\"\n");
++	fclose(inf);
++	rogue_restore_failed("\"He's dead, Jim\"");
+ 	return FALSE;
+     }
+ 
++    /*
++     * we do not close the file so that we will have a hold of the
++     * inode for as long as possible
++     */
++
++    if (
++#ifdef MASTER
++	!wizard &&
++#endif
++        md_unlink_open_file(file, inf) < 0)
++    {
++	endwin();
++	rogue_restore_failed("Cannot delete the saved game.");
++	return FALSE;
++    }
++    mpos = 0;
++/*    printw(0, 0, "%s: %s", file, ctime(&sbuf2.st_mtime)); */
++/*
++    printw("%s: %s", file, ctime(&sbuf2.st_mtime));
++*/
++    clearok(stdscr,TRUE);
++
+ 	md_tstpresume();
+ 
+     environ = envp;
