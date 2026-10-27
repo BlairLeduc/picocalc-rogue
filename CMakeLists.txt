@@ -150,6 +150,11 @@ target_link_libraries(picocalc-rogue
     hardware_pio
     hardware_clocks)
 
+# The RP2350's always-on timer, for the time the shell keeps
+if (TARGET hardware_powman)
+    target_link_libraries(picocalc-rogue hardware_powman)
+endif()
+
 # Add the standard include files to the build
 target_include_directories(picocalc-rogue PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
