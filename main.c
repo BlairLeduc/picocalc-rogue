@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/time.h>
 
 #include "hardware/watchdog.h"
 #include "pico/rand.h"
@@ -88,6 +89,20 @@ static void return_to_loader(void)
 #endif
 }
 
+// Set the clock from the time the shell keeps, as local time; without it, time() counts from 1970
+static void set_clock(void)
+{
+#ifdef PICOCALC_SHELL_HAS_TIME
+    int64_t utc_ms;
+    int offset_min;
+    if (picocalc_shell_time(&utc_ms, &offset_min))
+    {
+        struct timeval tv = {.tv_sec = (time_t)(utc_ms / 1000 + offset_min * 60)};
+        settimeofday(&tv, NULL);
+    }
+#endif
+}
+
 // Show why the saved game could not be restored, and wait for a key
 void rogue_restore_failed(const char *reason)
 {
@@ -158,6 +173,7 @@ int main(int argc, char **argv, char **envp)
     audio_init();
     lcd_init();
     fat32_init();
+    set_clock();
 
     // poll every 100 ms for key events
     add_repeating_timer_ms(100, on_keyboard_timer, NULL, &key_timer);
