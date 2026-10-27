@@ -24,7 +24,12 @@ if (EXISTS ${picoVscode})
 endif()
 # ====================================================================================
 set(PICO_BOARD pico2 CACHE STRING "Board type")
-set(PICOCALC_ROGUE_VERSION "1.1" CACHE STRING "PicoCalc Rogue version")
+# Not cached, so a change here reaches existing build directories;
+# -DPICOCALC_ROGUE_VERSION=x.y still overrides it
+if (NOT DEFINED PICOCALC_ROGUE_VERSION)
+    set(PICOCALC_ROGUE_VERSION "1.3")
+endif()
+option(PICOCALC_ROGUE_NO_FLASH "Build a no_flash binary that runs from SRAM" OFF)
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
@@ -104,6 +109,12 @@ add_executable(picocalc-rogue
     )
 
 add_dependencies(picocalc-rogue patch_rogue patch_pdcurses)
+
+# A no_flash build is loaded into SRAM by UF2 Loader without touching flash
+if (PICOCALC_ROGUE_NO_FLASH)
+    pico_set_binary_type(picocalc-rogue no_flash)
+    set_target_properties(picocalc-rogue PROPERTIES OUTPUT_NAME picocalc-rogue-noflash)
+endif()
 
 # Add executable. Default name is the project name, version, url
 pico_set_program_name(picocalc-rogue "picocalc-rogue")
